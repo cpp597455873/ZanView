@@ -8,7 +8,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import butterknife.ButterKnife;
-import simonw.view.zan.ZanView;
+import simonw.view.zan.LikeView;
 
 public class DemoActivity extends AppCompatActivity implements View.OnClickListener {
     public RelativeLayout layout_main;
@@ -16,7 +16,7 @@ public class DemoActivity extends AppCompatActivity implements View.OnClickListe
     public Button btn_end;
     public Button btn_add;
     public Button btn_close;
-    public ZanView zanView;
+    public LikeView likeView;
     public TextView tv_close;
 
     private int mWidth;
@@ -36,13 +36,13 @@ public class DemoActivity extends AppCompatActivity implements View.OnClickListe
         btn_end = findViewById(R.id.btn_end);
         btn_add = findViewById(R.id.btn_add);
         btn_close = findViewById(R.id.btn_close);
-        zanView = findViewById(R.id.v_zan);
         tv_close = findViewById(R.id.tv_close);
         btn_brgin.setOnClickListener(this);
         btn_end.setOnClickListener(this);
         btn_add.setOnClickListener(this);
         btn_close.setOnClickListener(this);
         layout_main = findViewById(R.id.layout_main);
+        likeView = findViewById(R.id.like_view);
     }
 
 
@@ -55,13 +55,16 @@ public class DemoActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         int id = view.getId();
         if (id == R.id.btn_brgin) {
-            zanView.autoAddZan();
+//            zanView.autoAddZan();
+            likeView.autoAddZan();
         } else if (id == R.id.btn_end) {
             //停止
-            zanView.stopAddHeart();
+//            zanView.stopAddHeart();
+            likeView.stopAddHeart();
         } else if (id == R.id.btn_add) {
             //增加一个飘赞
-            zanView.addZanXin();
+            //zanView.addZanXin();
+            likeView.addZanXin();
         }
     }
 }

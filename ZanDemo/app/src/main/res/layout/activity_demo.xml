@@ -9,10 +9,11 @@
         android:layout_height="match_parent"
         android:padding="16dp">
 
-        <simonw.view.zan.ZanView
-            android:id="@+id/v_zan"
+
+        <simonw.view.zan.LikeView
+            android:id="@+id/like_view"
             android:layout_width="67dp"
-            android:layout_height="100dp"
+            android:layout_height="255dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true" />
 

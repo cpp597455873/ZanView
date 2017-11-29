@@ -65,16 +65,22 @@ public class ZanBean {
     }
 
     private void init() {
-        int pointX1 = random.nextInt(mWidth - mBitmapWidth);
-        int pointX2 = random.nextInt(mWidth - mBitmapWidth);
-        int pointY1 = random.nextInt(mHeight / 4) + mHeight / 4;
-        int pointY2 = random.nextInt(mHeight / 4) + mHeight / 2;
+        int boundX = mWidth - mBitmapWidth;
+        int boundY = mHeight / 4;
+        //这里边界可能小于0,在random的时候可能会崩溃掉
+        if (boundX <= 0 || boundY <= 0) {
+            return;
+        }
+        int pointX1 = random.nextInt(boundX);
+        int pointX2 = random.nextInt(boundX);
+        int pointY1 = random.nextInt(boundY) + boundY;
+        int pointY2 = random.nextInt(boundY) + mHeight / 2;
 
         final Point controlPoint1 = new Point(pointX1, pointY1);
         final Point controlPoint2 = new Point(pointX2, pointY2);
         ZanBezierEvaluator evaluator = new ZanBezierEvaluator(controlPoint1, controlPoint2);
         final Point point1 = new Point(mWidth / 2, mHeight - mBitmapWidth);
-        final Point point2 = new Point(random.nextInt(mWidth - mBitmapWidth), 0);
+        final Point point2 = new Point(random.nextInt(boundX), 0);
 
         moveAnim = ValueAnimator.ofObject(evaluator, point1, point2);
         moveAnim.setDuration(2000);
