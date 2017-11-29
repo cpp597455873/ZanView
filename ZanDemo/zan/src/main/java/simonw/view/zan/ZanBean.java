@@ -1,14 +1,12 @@
 package simonw.view.zan;
 
-import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
-import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.os.Build;
+import android.view.animation.DecelerateInterpolator;
 
 import java.util.Random;
 
@@ -30,7 +28,7 @@ public class ZanBean {
     /**
      * 透明度
      */
-    public int alpha = 255;//
+    public int alpha = 255;
     /**
      * 心图
      */
@@ -42,68 +40,63 @@ public class ZanBean {
     /**
      * 缩放系数
      */
-    private float sf = 0;
+    private float scale = 0;
     /**
      * 产生随机数
      */
     private Random random = new Random();
-    public boolean isEnd = false;//是否结束
+    /**
+     * 是否结束
+     */
+    public boolean isEnd = false;
 
-    /*public ZanBean(Context context, int resId, ZanView zanView) {
-        bitmap = BitmapFactory.decodeResource(context.getResources(), resId);
-        init(new Point(zanView.getWidth() / 2, zanView.getHeight() - bitmap.getHeight() / 2), new Point(DensityUtils.dip2px(zanView.getContext(), 150), 0));
-    }*/
+    private int mHeight;
+    private int mWidth;
+    private int mBitmapWidth;
 
 
     public ZanBean(Bitmap bitmap, int width, int height) {
         random = new Random();
         this.bitmap = bitmap;
-        //int width = DensityUtils.dip2px(ctx, 150);
-        //int height = DensityUtils.dip2px(ctx, 160);
-        //为了让在起始坐标点时显示完整 需要减去bitmap.getHeight()/2
-        init(new Point(width / 2, height - bitmap.getHeight() / 2), new Point(width, 0));
+        mBitmapWidth = bitmap.getWidth();
+        mHeight = height;
+        mWidth = width;
+        init();
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private void init(final Point startPoint, Point endPoint) {
-        moveAnim = ValueAnimator.ofObject(new BezierEvaluator(new Point(random.nextInt(startPoint.x * 2), Math.abs(endPoint.y - startPoint.y) / 2)), startPoint, endPoint);
-        moveAnim.setDuration(1500);
+    private void init() {
+        int pointX1 = random.nextInt(mWidth - mBitmapWidth);
+        int pointX2 = random.nextInt(mWidth - mBitmapWidth);
+        int pointY1 = random.nextInt(mHeight / 4) + mHeight / 4;
+        int pointY2 = random.nextInt(mHeight / 4) + mHeight / 2;
+
+        final Point controlPoint1 = new Point(pointX1, pointY1);
+        final Point controlPoint2 = new Point(pointX2, pointY2);
+        ZanBezierEvaluator evaluator = new ZanBezierEvaluator(controlPoint1, controlPoint2);
+        final Point point1 = new Point(mWidth / 2, mHeight - mBitmapWidth);
+        final Point point2 = new Point(random.nextInt(mWidth - mBitmapWidth), 0);
+
+        moveAnim = ValueAnimator.ofObject(evaluator, point1, point2);
+        moveAnim.setDuration(2000);
         moveAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                point = (Point) animation.getAnimatedValue();
-                alpha = (int) ((float) point.y / (float) startPoint.y * 255);
+                ZanBean.this.point = (Point) animation.getAnimatedValue();
+                alpha = (int) ((float) ZanBean.this.point.y / (float) point1.y * 255);
             }
         });
         moveAnim.start();
         zoomAnim = ValueAnimator.ofFloat(0, 1f).setDuration(700);
+        zoomAnim.setInterpolator(new DecelerateInterpolator());
         zoomAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                Float f = (Float) animation.getAnimatedValue();
-                sf = f.floatValue();
+                scale = (Float) animation.getAnimatedValue();
             }
         });
         zoomAnim.start();
     }
 
-//    public void pause(){
-//        if(moveAnim !=null&& moveAnim.isRunning()){
-//            moveAnim.pause();
-//        }
-//        if(zoomAnim !=null&& zoomAnim.isRunning()){
-//            zoomAnim.pause();
-//        }
-//    }
-//
-//    public void resume(){
-//        if(moveAnim !=null&& moveAnim.isPaused()){
-//            moveAnim.resume();
-//        }
-//        if(zoomAnim !=null&& zoomAnim.isPaused()){
-//            zoomAnim.resume();
-//        }
-//    }
 
     public void stop() {
         if (moveAnim != null) {
@@ -122,31 +115,11 @@ public class ZanBean {
     public void draw(Canvas canvas, Paint p) {
         if (bitmap != null && alpha > 0) {
             p.setAlpha(alpha);
-            matrix.setScale(sf, sf, bitmap.getWidth() / 2, bitmap.getHeight() / 2);
-            matrix.postTranslate(point.x - bitmap.getWidth() / 2, point.y - bitmap.getHeight() / 2);
+            matrix.setScale(scale, scale, mBitmapWidth / 2, mBitmapWidth / 2);
+            matrix.postTranslate(point.x, point.y);
             canvas.drawBitmap(bitmap, matrix, p);
         } else {
             isEnd = true;
-        }
-    }
-
-    /**
-     * 二次贝塞尔曲线
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private class BezierEvaluator implements TypeEvaluator<Point> {
-
-        private Point centerPoint;
-
-        public BezierEvaluator(Point centerPoint) {
-            this.centerPoint = centerPoint;
-        }
-
-        @Override
-        public Point evaluate(float t, Point startValue, Point endValue) {
-            int x = (int) ((1 - t) * (1 - t) * startValue.x + 2 * t * (1 - t) * centerPoint.x + t * t * endValue.x);
-            int y = (int) ((1 - t) * (1 - t) * startValue.y + 2 * t * (1 - t) * centerPoint.y + t * t * endValue.y);
-            return new Point(x, y);
         }
     }
 }
