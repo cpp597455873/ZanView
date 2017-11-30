@@ -1,6 +1,5 @@
 package simonw.view.zan;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,9 +15,6 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author chenpiaopiao
@@ -27,6 +23,22 @@ import java.util.concurrent.TimeUnit;
 
 
 public class LikeView extends View {
+    /**
+     * 每秒发射几颗爱心
+     */
+    private int countPerSecond = 5;
+    /**
+     * 新增点赞
+     */
+    private final int ADD_LIKE = 1;
+    /**
+     * 刷新View
+     */
+    private final int INVALIDATE_CANVAS = 2;
+    /**
+     * 屏幕最大点赞数量
+     */
+    private int MAX_LIKE = 20;
 
     private ArrayList<ZanBean> zanBeen = new ArrayList<>();
     private List<Drawable> mDrawbleList = new ArrayList<>();
@@ -34,14 +46,35 @@ public class LikeView extends View {
 
     private boolean autoStart = false;
 
-    @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            if (msg.what == ADD_LIKE) {
+                addZanXin();
+            } else if (msg.what == INVALIDATE_CANVAS) {
+                invalidate();
+            }
         }
     };
-    private ScheduledExecutorService scheduledExecutorService;
+    /**
+     * 绘制开始时间
+     */
+    private long drawStartTime;
+    /**
+     * 下次是否继续刷新
+     */
+    private boolean invalidateNextTime;
+    /**
+     * 点赞循环增加
+     */
+    private Runnable zanRunnable = new Runnable() {
+        @Override
+        public void run() {
+            addZanXin();
+            addZanTick();
+        }
+    };
 
 
     public LikeView(Context context) {
@@ -68,13 +101,12 @@ public class LikeView extends View {
     /**
      * 点赞动作  添加心的函数 控制画面最大心的个数
      */
-
     public void addZanXin() {
         int width = getWidth();
         int height = getHeight();
         ZanBean zanBean = new ZanBean(((BitmapDrawable) mDrawbleList.get(new Random().nextInt(mDrawbleList.size() - 1))).getBitmap(), width, height);
         zanBeen.add(zanBean);
-        if (zanBeen.size() > 20) {
+        if (zanBeen.size() > MAX_LIKE) {
             zanBeen.remove(0);
         }
         invalidate();
@@ -84,7 +116,7 @@ public class LikeView extends View {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         stopAddHeart();
-        mZanHandler = null;
+        handler.removeCallbacks(null);
     }
 
     @Override
@@ -98,7 +130,8 @@ public class LikeView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         //用于记录下次是否刷新
-        boolean invalidateNextTime = false;
+        drawStartTime = System.currentTimeMillis();
+        invalidateNextTime = false;
         if (canvas != null) {
             //刷新背景
             canvas.drawColor(Color.TRANSPARENT);
@@ -112,52 +145,36 @@ public class LikeView extends View {
             super.onDraw(canvas);
         }
         if (invalidateNextTime) {
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    invalidate();
-                }
-            }, 10);
+            //保证60fps的刷新
+            handler.sendEmptyMessageDelayed(INVALIDATE_CANVAS, Math.max(0, 16 - (System.currentTimeMillis() - drawStartTime)));
         }
 
     }
 
-    private Handler mZanHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            addZanXin();
+    /**
+     * 停止自动增加点赞
+     */
+    public void stopAddHeart() {
+        for (int i = 0; i < zanBeen.size(); i++) {
+            zanBeen.get(i).stop();
         }
-    };
-
-    public synchronized void stopAddHeart() {
-        try {
-            for (int i = 0; i < zanBeen.size(); i++) {
-                zanBeen.get(i).stop();
-            }
-            zanBeen.clear();
-            if (scheduledExecutorService != null) {
-                scheduledExecutorService.shutdownNow();
-                scheduledExecutorService = null;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        zanBeen.clear();
+        handler.removeCallbacks(zanRunnable);
     }
 
+    /**
+     * 定时点赞
+     */
+    public void addZanTick() {
+        handler.postDelayed(zanRunnable, 1000 / countPerSecond);
+    }
+
+    /**
+     * 自动增加点赞
+     */
     public void autoAddZan() {
         stopAddHeart();
         autoStart = true;
-        scheduledExecutorService = Executors.newScheduledThreadPool(20);
-        scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                if (mZanHandler != null) {
-                    Message msg = mZanHandler.obtainMessage();
-                    msg.sendToTarget();
-                }
-            }
-        }, 0, 500, TimeUnit.MILLISECONDS);
+        addZanTick();
     }
 }
