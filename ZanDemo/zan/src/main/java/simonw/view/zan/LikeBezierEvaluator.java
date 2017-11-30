@@ -22,8 +22,10 @@ import android.graphics.Point;
 /**
  * 三次贝塞尔曲线
  *
- * @author cpp59
+ * @author chenpiaopiao
+ * @date 2017/11/29 16:00
  */
+
 public class LikeBezierEvaluator implements TypeEvaluator<Point> {
 
 
@@ -39,19 +41,10 @@ public class LikeBezierEvaluator implements TypeEvaluator<Point> {
 
     @Override
     public Point evaluate(float time, Point startValue, Point endValue) {
-
         float timeLeft = 1.0f - time;
-
         // 贝塞尔曲线公式
-        point.x = (int) (timeLeft * timeLeft * timeLeft * (startValue.x)
-                + 3 * timeLeft * timeLeft * time * (controlPoint1.x)
-                + 3 * timeLeft * time * time * (controlPoint2.x)
-                + time * time * time * (endValue.x));
-
-        point.y = (int) (timeLeft * timeLeft * timeLeft * (startValue.y)
-                + 3 * timeLeft * timeLeft * time * (controlPoint1.y)
-                + 3 * timeLeft * time * time * (controlPoint2.y)
-                + time * time * time * (endValue.y));
+        point.x = (int) (timeLeft * timeLeft * timeLeft * (startValue.x) + 3 * timeLeft * timeLeft * time * (controlPoint1.x) + 3 * timeLeft * time * time * (controlPoint2.x) + time * time * time * (endValue.x));
+        point.y = (int) (timeLeft * timeLeft * timeLeft * (startValue.y) + 3 * timeLeft * timeLeft * time * (controlPoint1.y) + 3 * timeLeft * time * time * (controlPoint2.y) + time * time * time * (endValue.y));
         return point;
     }
 }

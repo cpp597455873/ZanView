@@ -77,15 +77,4 @@ PS2:当直播结束，弹出结束页的时候，要手动关闭presenter和view
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/tv_close"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/darker_gray"
-        android:gravity="center"
-        android:text="直播结束！"
-        android:textColor="@android:color/black"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:visibility="invisible" />
 </FrameLayout>

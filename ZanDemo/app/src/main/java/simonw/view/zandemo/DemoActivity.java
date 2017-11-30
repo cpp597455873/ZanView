@@ -19,11 +19,6 @@ public class DemoActivity extends AppCompatActivity implements View.OnClickListe
     public LikeView likeView;
     public TextView tv_close;
 
-    private int mWidth;
-    private int mHeight;
-    private boolean mIsFirst = true;
-    private float mLastX;
-    private float mLastY;
 
 
     @Override

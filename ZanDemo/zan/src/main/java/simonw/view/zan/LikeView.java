@@ -20,8 +20,6 @@ import java.util.Random;
  * @author chenpiaopiao
  * @date 2017/11/29 16:00
  */
-
-
 public class LikeView extends View {
     /**
      * 每秒发射几颗爱心

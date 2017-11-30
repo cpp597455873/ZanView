@@ -10,7 +10,12 @@ import android.view.animation.DecelerateInterpolator;
 
 import java.util.Random;
 
-
+/**
+ * 点赞的每一颗赞
+ *
+ * @author chenpiaopiao
+ * @date 2017/11/29 16:00
+ */
 public class LikeBean {
 
     /**
