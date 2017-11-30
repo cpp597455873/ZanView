@@ -24,7 +24,7 @@ import android.graphics.Point;
  *
  * @author cpp59
  */
-public class ZanBezierEvaluator implements TypeEvaluator<Point> {
+public class LikeBezierEvaluator implements TypeEvaluator<Point> {
 
 
     private Point controlPoint1;
@@ -32,7 +32,7 @@ public class ZanBezierEvaluator implements TypeEvaluator<Point> {
     private Point point = new Point();//结果
 
 
-    public ZanBezierEvaluator(Point controlPoint1, Point controlPoint2) {
+    public LikeBezierEvaluator(Point controlPoint1, Point controlPoint2) {
         this.controlPoint1 = controlPoint1;
         this.controlPoint2 = controlPoint2;
     }

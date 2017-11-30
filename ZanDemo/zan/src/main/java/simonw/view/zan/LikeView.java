@@ -40,7 +40,7 @@ public class LikeView extends View {
      */
     private int MAX_LIKE = 20;
 
-    private ArrayList<ZanBean> zanBeen = new ArrayList<>();
+    private ArrayList<LikeBean> likeBeans = new ArrayList<>();
     private List<Drawable> mDrawbleList = new ArrayList<>();
     private Paint p;
 
@@ -51,7 +51,7 @@ public class LikeView extends View {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if (msg.what == ADD_LIKE) {
-                addZanXin();
+                addLike();
             } else if (msg.what == INVALIDATE_CANVAS) {
                 invalidate();
             }
@@ -68,11 +68,11 @@ public class LikeView extends View {
     /**
      * 点赞循环增加
      */
-    private Runnable zanRunnable = new Runnable() {
+    private Runnable likeRunnable = new Runnable() {
         @Override
         public void run() {
-            addZanXin();
-            addZanTick();
+            addLike();
+            addLikeTick();
         }
     };
 
@@ -101,13 +101,13 @@ public class LikeView extends View {
     /**
      * 点赞动作  添加心的函数 控制画面最大心的个数
      */
-    public void addZanXin() {
+    public void addLike() {
         int width = getWidth();
         int height = getHeight();
-        ZanBean zanBean = new ZanBean(((BitmapDrawable) mDrawbleList.get(new Random().nextInt(mDrawbleList.size() - 1))).getBitmap(), width, height);
-        zanBeen.add(zanBean);
-        if (zanBeen.size() > MAX_LIKE) {
-            zanBeen.remove(0);
+        LikeBean likeBean = new LikeBean(((BitmapDrawable) mDrawbleList.get(new Random().nextInt(mDrawbleList.size() - 1))).getBitmap(), width, height);
+        likeBeans.add(likeBean);
+        if (likeBeans.size() > MAX_LIKE) {
+            likeBeans.remove(0);
         }
         invalidate();
     }
@@ -115,7 +115,7 @@ public class LikeView extends View {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        stopAddHeart();
+        stopAddLike();
         handler.removeCallbacks(null);
     }
 
@@ -123,7 +123,7 @@ public class LikeView extends View {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         if (autoStart) {
-            autoAddZan();
+            autoAddLike();
         }
     }
 
@@ -135,10 +135,10 @@ public class LikeView extends View {
         if (canvas != null) {
             //刷新背景
             canvas.drawColor(Color.TRANSPARENT);
-            for (int i = 0; i < zanBeen.size(); i++) {
-                ZanBean zanBean = zanBeen.get(i);
-                zanBean.draw(canvas, p);
-                if (!zanBean.isEnd) {
+            for (int i = 0; i < likeBeans.size(); i++) {
+                LikeBean likeBean = likeBeans.get(i);
+                likeBean.draw(canvas, p);
+                if (!likeBean.isEnd) {
                     invalidateNextTime = true;
                 }
             }
@@ -154,27 +154,27 @@ public class LikeView extends View {
     /**
      * 停止自动增加点赞
      */
-    public void stopAddHeart() {
-        for (int i = 0; i < zanBeen.size(); i++) {
-            zanBeen.get(i).stop();
+    public void stopAddLike() {
+        for (int i = 0; i < likeBeans.size(); i++) {
+            likeBeans.get(i).stop();
         }
-        zanBeen.clear();
-        handler.removeCallbacks(zanRunnable);
+        likeBeans.clear();
+        handler.removeCallbacks(likeRunnable);
     }
 
     /**
      * 定时点赞
      */
-    public void addZanTick() {
-        handler.postDelayed(zanRunnable, 1000 / countPerSecond);
+    public void addLikeTick() {
+        handler.postDelayed(likeRunnable, 1000 / countPerSecond);
     }
 
     /**
      * 自动增加点赞
      */
-    public void autoAddZan() {
-        stopAddHeart();
+    public void autoAddLike() {
+        stopAddLike();
         autoStart = true;
-        addZanTick();
+        addLikeTick();
     }
 }

@@ -11,7 +11,7 @@ import android.view.animation.DecelerateInterpolator;
 import java.util.Random;
 
 
-public class ZanBean {
+public class LikeBean {
 
     /**
      * 心的当前坐标
@@ -55,7 +55,7 @@ public class ZanBean {
     private int mBitmapWidth;
 
 
-    public ZanBean(Bitmap bitmap, int width, int height) {
+    public LikeBean(Bitmap bitmap, int width, int height) {
         random = new Random();
         this.bitmap = bitmap;
         mBitmapWidth = bitmap.getWidth();
@@ -78,7 +78,7 @@ public class ZanBean {
 
         final Point controlPoint1 = new Point(pointX1, pointY1);
         final Point controlPoint2 = new Point(pointX2, pointY2);
-        ZanBezierEvaluator evaluator = new ZanBezierEvaluator(controlPoint1, controlPoint2);
+        LikeBezierEvaluator evaluator = new LikeBezierEvaluator(controlPoint1, controlPoint2);
         final Point point1 = new Point(mWidth / 2, mHeight - mBitmapWidth);
         final Point point2 = new Point(random.nextInt(boundX), 0);
 
@@ -87,8 +87,8 @@ public class ZanBean {
         moveAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                ZanBean.this.point = (Point) animation.getAnimatedValue();
-                alpha = (int) ((float) ZanBean.this.point.y / (float) point1.y * 255);
+                LikeBean.this.point = (Point) animation.getAnimatedValue();
+                alpha = (int) ((float) LikeBean.this.point.y / (float) point1.y * 255);
             }
         });
         moveAnim.start();

@@ -56,15 +56,15 @@ public class DemoActivity extends AppCompatActivity implements View.OnClickListe
         int id = view.getId();
         if (id == R.id.btn_brgin) {
 //            zanView.autoAddZan();
-            likeView.autoAddZan();
+            likeView.autoAddLike();
         } else if (id == R.id.btn_end) {
             //停止
 //            zanView.stopAddHeart();
-            likeView.stopAddHeart();
+            likeView.stopAddLike();
         } else if (id == R.id.btn_add) {
             //增加一个飘赞
             //zanView.addZanXin();
-            likeView.addZanXin();
+            likeView.addLike();
         }
     }
 }
